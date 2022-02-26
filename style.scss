@@ -1,0 +1,395 @@
+*,
+*::before,
+*::after {
+  padding: 0;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Raleway', sans-serif;
+  background-color: #eee;
+  color: #111;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  perspective: 1000px;
+  overflow: hidden;
+
+  *:not(:empty) {
+    transform-style: preserve-3d;
+  }
+}
+
+.scene {
+  position: relative;
+}
+
+.rotateBtn {
+  position: absolute;
+  left: 0;
+  top: -1em;
+  width: 3em;
+  height: 3em;
+  background: none;
+  border: solid #000a;
+  border-width: 0 0 8px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  animation: btnSwing 0.2s infinite ease-in-out alternate paused;
+
+  @keyframes btnSwing {
+    from {
+      transform: translateX(-5%) rotateZ(var(--rz));
+    }
+    to {
+      transform: translateX(5%) rotateZ(var(--rz));
+    }
+  }
+
+  &:hover {
+    animation-play-state: running;
+  }
+
+  &:active {
+    border-color: #000;
+  }
+
+  &#turnLeft {
+    transform: rotate(45deg);
+    --rz: 45deg;
+    left: -26em;
+  }
+
+  &#turnRight {
+    transform: rotate(-135deg);
+    --rz: -135deg;
+    left: 24em;
+  }
+}
+
+.cameraRotate {
+  &_left {
+    animation: sceneRotateX 8s -7.5s infinite linear paused;
+  }
+
+  &_right {
+    animation: sceneRotateX 8s infinite linear paused reverse;
+  }
+
+  @keyframes sceneRotateX {
+    from {
+      transform: rotateY(0deg);
+    }
+    to {
+      transform: rotateY(-360deg);
+    }
+  }
+}
+
+#turnLeft:active ~ .cameraRotate_left,
+#turnRight:active ~ .cameraRotate_left .cameraRotate_right {
+  animation-play-state: running;
+}
+
+$speed: 0.75s;
+
+.stickHorse {
+  position: absolute;
+
+  & * {
+    position: absolute;
+  }
+}
+
+i {
+  left: -0.5em;
+  top: -0.5em;
+  width: 1em;
+  height: calc(100% + 1em);
+  background-color: #333;
+  background-image: linear-gradient(#444, #222);
+  border-radius: 0.5em;
+  transform: rotateY(var(--ry));
+
+  @for $i from 0 to 6 {
+    &:nth-child(#{$i + 1}) {
+      --ry: #{180deg / 6 * $i};
+    }
+  }
+}
+
+.spine {
+  height: 12em;
+  background-color: dodgerblue;
+  // transform: translateY(-6em) rotateZ(-90deg);
+  animation: spine $speed ease-in-out infinite alternate;
+
+  @keyframes spine {
+    from {
+      transform: translateY(-6em) rotateZ(-93deg);
+    }
+    to {
+      transform: translateY(-6em) rotateZ(-87deg);
+    }
+  }
+}
+
+.neck {
+  bottom: 100%;
+  height: 6em;
+  transform-origin: bottom;
+  animation: neck $speed infinite ease-in-out alternate;
+
+  @keyframes neck {
+    from {
+      transform: rotateZ(55deg);
+    }
+    to {
+      transform: rotateZ(70deg);
+    }
+  }
+}
+
+.head {
+  bottom: 100%;
+  height: 6em;
+  transform-origin: bottom;
+  animation: head $speed/2 infinite ease-in-out alternate;
+
+  @keyframes head {
+    from {
+      transform: rotateZ(-100deg);
+    }
+    to {
+      transform: rotateZ(-70deg);
+    }
+  }
+
+  & > i {
+    width: 4em;
+    left: -2em;
+    border-radius: 50% / 60% 60% 40% 40%;
+
+    @for $i from 0 to 24 {
+      &:nth-child(#{$i + 1}) {
+        --ry: #{180deg / 24 * $i};
+      }
+    }
+  }
+}
+
+.arm {
+  bottom: 100%;
+  height: 6em;
+  transform-origin: bottom;
+  animation: arm $speed var(--delay, 0s) ease-in-out infinite alternate;
+
+  @keyframes arm {
+    from {
+      transform: rotateZ(-120deg) rotateX(var(--rx));
+    }
+    to {
+      transform: rotateZ(-30deg) rotateX(var(--rx));
+    }
+  }
+
+  &.l {
+    --rx: -20deg;
+  }
+  &.r {
+    --rx: 20deg;
+    --delay: #{$speed / 3 * -5};
+  }
+  --rz: -10deg;
+}
+
+.leg {
+  bottom: 0%;
+  height: 6em;
+  transform-origin: bottom;
+  animation: leg $speed var(--delay, 0s) ease-in-out infinite alternate;
+
+  @keyframes leg {
+    from {
+      transform: rotateZ(-120deg) rotateX(var(--rx));
+    }
+    to {
+      transform: rotateZ(-60deg) rotateX(var(--rx));
+    }
+  }
+
+  &.l {
+    --rx: -20deg;
+    --delay: #{$speed / 3 * -4};
+  }
+  &.r {
+    --rx: 20deg;
+    --delay: #{$speed / 3 * -3};
+  }
+  --rz: 10deg;
+}
+
+.bottomLimb {
+  bottom: 100%;
+  height: 6em;
+  transform-origin: bottom;
+  animation: bottomLimb $speed calc(var(--delay, 0s) - #{$speed * 0.55})
+    ease-in-out infinite alternate;
+
+  @keyframes bottomLimb {
+    from {
+      transform: rotateZ(0deg) rotateX(calc(var(--rx) * -1));
+    }
+    to {
+      transform: rotateZ(-80deg) rotateX(calc(var(--rx) * -1));
+    }
+  }
+}
+
+.tail {
+  bottom: 0%;
+  height: 2em;
+  transform-origin: bottom;
+  animation: tail $speed infinite ease-in-out alternate;
+
+  @keyframes tail {
+    from {
+      transform: rotateZ(160deg);
+    }
+    to {
+      transform: rotateZ(140deg);
+    }
+  }
+
+  & div {
+    all: inherit;
+    bottom: 100%;
+  }
+
+  & > div {
+    height: 80%;
+    // transform: rotateZ(20deg);
+    animation: tail2 $speed/3 infinite ease-in-out alternate;
+
+    @keyframes tail2 {
+      from {
+        transform: rotateZ(20deg) rotateX(5deg);
+      }
+      to {
+        transform: rotateZ(20deg) rotateX(-5deg);
+      }
+    }
+  }
+}
+
+.background {
+  position: absolute;
+
+  & > div {
+    position: absolute;
+    left: -1px;
+    top: -25em;
+    width: 2px;
+    height: 50em;
+    background-image: linear-gradient(#0000, #fff, #0000);
+    transform: rotateY(var(--ry)) translateZ(-24em);
+    backface-visibility: hidden;
+
+    $count: 24;
+    @for $i from 0 to $count {
+      &:nth-child(#{$i + 1}) {
+        --ry: #{360deg / $count * $i};
+      }
+    }
+  }
+}
+
+.floor {
+  position: absolute;
+  top: 11.8em;
+  width: 32em;
+  height: 32em;
+  transform: translate(-50%, -50%) rotateX(90deg);
+  background-image: repeating-linear-gradient(90deg, #fff 0 2px, #eee 0 2em);
+  box-shadow: 0 0 2em #0007 inset;
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  animation: floorWalk $speed infinite linear;
+
+  @keyframes floorWalk {
+    to {
+      background-position-x: 12em;
+    }
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -50%;
+    top: -50%;
+    width: 200%;
+    height: 200%;
+    background-image: radial-gradient(#0007, #0000 50%);
+    transform: translateZ(-2em);
+  }
+}
+
+.shadows {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background-image: radial-gradient(#0005, #0000 50%);
+
+  & > div {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 20em;
+    height: 20em;
+    background-image: radial-gradient(#0003, #0000 66%);
+    border-radius: 50%;
+    animation: shadows $speed var(--delay, 0s) ease-in-out infinite alternate;
+
+    @keyframes shadows {
+      from {
+        transform: translate(-50%, -50%) translateY(var(--ty, 0))
+          translateX(var(--tx2, 0));
+        opacity: 0.3;
+      }
+      to {
+        transform: translate(-50%, -50%) translateY(var(--ty, 0))
+          translateX(var(--tx1, 0));
+        opacity: 1;
+      }
+    }
+
+    &:nth-child(1) {
+      --ty: -2em;
+      --tx1: 1em;
+      --tx2: -16em;
+      --delay: #{$speed / 3 * -2};
+    }
+    &:nth-child(2) {
+      --ty: 2em;
+      --tx1: 1em;
+      --tx2: -16em;
+      --delay: #{$speed / 3 * -3};
+    }
+    &:nth-child(3) {
+      --ty: 2em;
+      --tx1: -1em;
+      --tx2: 13em;
+      --delay: #{$speed / 3 * -4};
+    }
+    &:nth-child(4) {
+      --ty: -2em;
+      --tx1: -1em;
+      --tx2: 13em;
+      --delay: #{$speed / 3 * -3};
+    }
+  }
+}
